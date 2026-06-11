@@ -1,11 +1,9 @@
 ﻿using Domain.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models
 {
     public class DiscoverySource
     {
-        [Key]
         public int Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
