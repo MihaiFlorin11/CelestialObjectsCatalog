@@ -7,7 +7,7 @@ namespace Infrastructure.Context
 {
     public class DatabaseContext(DbContextOptions<DatabaseContext> options, IOptions<DatabaseSettings> settings) : DbContext(options)
     {
-        private readonly DatabaseSettings _settings = null!;
+        private readonly DatabaseSettings _settings = settings.Value;
 
         public DbSet<CelestialObject> CelestialObjects { get; set; }
 

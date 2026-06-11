@@ -2,6 +2,7 @@ using Application.Abstraction;
 using Infrastructure.Context;
 using Infrastructure.Services;
 using Infrastructure.Settings;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,14 +11,25 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
-// database container registration
-builder.Services.AddScoped<DatabaseContext>();
+builder.Services.Configure<DatabaseSettings>(
+    builder.Configuration.GetSection(nameof(DatabaseSettings)));
 
-// unit of work
+var connectionString = builder.Configuration
+    .GetSection(nameof(DatabaseSettings))
+    .Get<DatabaseSettings>()?
+    .ConnectionString;
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("Database connection string is missing.");
+}
+
+builder.Services.AddDbContext<DatabaseContext>(options =>
+{
+    options.UseMySQL(connectionString);
+});
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-// configuration (options)
-builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection(nameof(DatabaseSettings)));
 
 var app = builder.Build();
 
